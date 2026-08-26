@@ -98,3 +98,8 @@ def asistencia():
     
 if __name__ == "__main__":
     app.run(debug=True)
+from flask import send_file
+
+@app.route("/descargar")
+def descargar():
+    return send_file("asistencia.xlsx", as_attachment=True)
