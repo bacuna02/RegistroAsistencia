@@ -31,8 +31,8 @@ def asistencia():
         tipo = request.form["tipo"]  # Entrada o Salida
         lat = float(request.form["lat"])
         lon = float(request.form["lon"])
-        fecha = datetime.now().strftime("%Y-%m-%d")
-        hora = datetime.now().strftime("%H:%M:%S")
+        fecha = datetime.now(tz).strftime("%Y-%m-%d")
+        hora = datetime.now(tz).strftime("%H:%M:%S")
 
         # Validar ubicación
         if distancia(lat, lon, TALLER_LAT, TALLER_LON) > RADIO_PERMITIDO:
