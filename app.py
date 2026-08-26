@@ -3,6 +3,7 @@ from flask import Flask, request, render_template_string
 import sqlite3
 from datetime import datetime
 import math
+import pytz  
 
 app = Flask(__name__)
 
@@ -10,6 +11,9 @@ app = Flask(__name__)
 TALLER_LAT = -12.173043127500463
 TALLER_LON = -76.91693852892678
 RADIO_PERMITIDO = 0.05  # en km (50 metros)
+
+# Definir zona horaria de Lima
+tz = pytz.timezone("America/Lima")
 
 def distancia(lat1, lon1, lat2, lon2):
     R = 6371
