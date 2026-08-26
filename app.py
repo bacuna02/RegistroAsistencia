@@ -1,9 +1,10 @@
 # archivo: app.py
 from flask import Flask, request, render_template_string
-import sqlite3
 from datetime import datetime
 import math
-import pytz  
+import pytz
+import openpyxl
+import os
 
 app = Flask(__name__)
 
@@ -23,6 +24,27 @@ def distancia(lat1, lon1, lat2, lon2):
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
     return R * c
 
+def guardar_excel(nombre, dni, fecha, hora, tipo, lat, lon):
+    archivo = "asistencia.xlsx"
+    if not os.path.exists(archivo):
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Registros"
+        ws.append(["Nombre", "DNI", "Fecha", "Hora", "Tipo", "Latitud", "Longitud"])
+        wb.save(archivo)
+
+    wb = openpyxl.load_workbook(archivo)
+    ws = wb["Registros"]
+
+    # Validar que no registre más de una vez por día en cada tipo
+    for fila in ws.iter_rows(values_only=True):
+        if fila[1] == dni and fila[2] == fecha and fila[4] == tipo:
+            return False  # Ya existe registro
+
+    ws.append([nombre, dni, fecha, hora, tipo, lat, lon])
+    wb.save(archivo)
+    return True
+
 @app.route("/", methods=["GET", "POST"])
 def asistencia():
     if request.method == "POST":
@@ -38,25 +60,11 @@ def asistencia():
         if distancia(lat, lon, TALLER_LAT, TALLER_LON) > RADIO_PERMITIDO:
             return "❌ No estás en el taller, registro rechazado"
 
-        conn = sqlite3.connect("asistencia.db")
-        c = conn.cursor()
-        c.execute("""CREATE TABLE IF NOT EXISTS registros (
-                        nombre TEXT, dni TEXT, fecha TEXT, hora TEXT, tipo TEXT, lat REAL, lon REAL)""")
-
-        # Validar que no registre más de una vez por día en cada tipo
-        c.execute("SELECT * FROM registros WHERE dni=? AND fecha=? AND tipo=?", (dni, fecha, tipo))
-        if c.fetchone():
-            conn.close()
+        if not guardar_excel(nombre, dni, fecha, hora, tipo, lat, lon):
             return f"❌ Ya registraste {tipo} hoy"
 
-        # Guardar registro
-        c.execute("INSERT INTO registros (nombre, dni, fecha, hora, tipo, lat, lon) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                  (nombre, dni, fecha, hora, tipo, lat, lon))
-        conn.commit()
-        conn.close()
         return f"✅ {tipo} registrada correctamente a las {hora}"
 
-    # HTML incrustado con GPS
     return render_template_string('''
         <h2>Registro de Asistencia</h2>
         <form method="post" onsubmit="return enviarUbicacion();">
@@ -79,7 +87,7 @@ def asistencia():
                     document.getElementById("lon").value = pos.coords.longitude;
                     document.forms[0].submit();
                 });
-                return false; // esperar ubicación antes de enviar
+                return false;
             } else {
                 alert("Tu navegador no soporta GPS");
                 return false;
