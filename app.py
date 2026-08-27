@@ -9,8 +9,8 @@ import os
 app = Flask(__name__)
 
 # Coordenadas del taller (ejemplo: Villa María del Triunfo, Lima)
-TALLER_LAT = -12.173043127500463
-TALLER_LON = -76.91693852892678
+TALLER_LAT = -12.218535
+TALLER_LON = -76.908586
 RADIO_PERMITIDO = 0.05  # en km (50 metros)
 
 # Definir zona horaria de Lima
