@@ -24,7 +24,7 @@ creds = ServiceAccountCredentials.from_json_keyfile_name("/etc/secrets/registroa
 client = gspread.authorize(creds)
 
 # Abre tu hoja llamada "Asistencia"
-sheet = client.open("Asistencia").sheet1
+sheet = client.open("RegistroAsistencia_Taller").sheet1
 
 def distancia(lat1, lon1, lat2, lon2):
     R = 6371
