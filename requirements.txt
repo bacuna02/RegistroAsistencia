@@ -1,4 +1,5 @@
 flask
 gunicorn
 pytz
-openpyxl
+gspread
+oauth2client
