@@ -20,7 +20,7 @@ tz = pytz.timezone("America/Lima")
 scope = ["https://spreadsheets.google.com/feeds",
          "https://www.googleapis.com/auth/drive"]
 # ⚠️ Cambia "credenciales.json" por el nombre de tu archivo descargado
-creds = ServiceAccountCredentials.from_json_keyfile_name("credenciales.json", scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name("registroasistencia-506822-3b8cf94e41bd.json", scope)
 client = gspread.authorize(creds)
 
 # Abre tu hoja llamada "Asistencia"
