@@ -66,113 +66,110 @@ def asistencia():
             mensaje = f"✅ {tipo} registrada correctamente a las {hora}"
             clase = "success"
 
-    return render_template_string(f'''
-        <!DOCTYPE html>
-        <html lang="es">
-        <head>
-            <meta charset="UTF-8">
-            <title>Registro de Asistencia</title>
-            <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-            <style>
-                body {{
-                    font-family: 'Roboto', sans-serif;
-                    background-color: #f4f4f4;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100vh;
-                    margin: 0;
-                }}
-                .contenedor {{
-                    background: white;
-                    padding: 30px 40px;
-                    border-radius: 10px;
-                    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-                    text-align: center;
-                    width: 340px;
-                }}
-                .alert {{
-                    padding: 15px;
-                    margin-bottom: 20px;
-                    border-radius: 8px;
-                    font-weight: bold;
-                    font-size: 15px;
-                }}
-                .success {{
-                    background-color: #d4edda;
-                    color: #155724;
-                    border: 1px solid #c3e6cb;
-                }}
-                .error {{
-                    background-color: #f8d7da;
-                    color: #721c24;
-                    border: 1px solid #f5c6cb;
-                }}
-                .warning {{
-                    background-color: #fff3cd;
-                    color: #856404;
-                    border: 1px solid #ffeeba;
-                }}
-                input, select {{
-                    margin: 10px 0;
-                    padding: 8px;
-                    width: 90%;
-                    border: 1px solid #ccc;
-                    border-radius: 5px;
-                    font-size: 14px;
-                }}
-                button {{
-                    background-color: #ffcc00;
-                    border: none;
-                    padding: 10px 20px;
-                    border-radius: 5px;
-                    cursor: pointer;
-                    font-weight: bold;
-                    color: #333;
-                    transition: background-color 0.3s;
-                }}
-                button:hover {{
-                    background-color: #e6b800;
-                }}
-            </style>
-        </head>
-        <body>
-            <div class="contenedor">
-                <img src="{{{{ url_for('static', filename='logo.png') }}}}" alt="Logo Creativ Proyectos">
-                <h2>Registro de Asistencia</h2>
-                {% if mensaje %}
-                    <div class="alert {{clase}}">{{mensaje}}</div>
-                {% endif %}
-                <form method="post" onsubmit="return enviarUbicacion();">
-                    <input type="text" name="nombre" placeholder="Nombre" required><br>
-                    <input type="text" name="dni" placeholder="DNI" required><br>
-                    <select name="tipo" required>
-                        <option value="Entrada">Entrada</option>
-                        <option value="Salida">Salida</option>
-                    </select><br>
-                    <input type="hidden" name="lat" id="lat">
-                    <input type="hidden" name="lon" id="lon">
-                    <button type="submit">Marcar asistencia</button>
-                </form>
-            </div>
-            <script>
-            function enviarUbicacion() {{
-                if (navigator.geolocation) {{
-                    navigator.geolocation.getCurrentPosition(function(pos) {{
-                        document.getElementById("lat").value = pos.coords.latitude;
-                        document.getElementById("lon").value = pos.coords.longitude;
-                        document.forms[0].submit();
-                    }});
-                    return false;
-                }} else {{
-                    alert("Tu navegador no soporta GPS");
-                    return false;
-                }}
-            }}
-            </script>
-        </body>
-        </html>
-    ''', mensaje=mensaje, clase=clase)
-
-if __name__ == "__main__":
-    app.run(debug=True)
+    return render_template_string('''
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Registro de Asistencia</title>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+        <style>
+            body {
+                font-family: 'Roboto', sans-serif;
+                background-color: #f4f4f4;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
+            .contenedor {
+                background: white;
+                padding: 30px 40px;
+                border-radius: 10px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                text-align: center;
+                width: 340px;
+            }
+            .alert {
+                padding: 15px;
+                margin-bottom: 20px;
+                border-radius: 8px;
+                font-weight: bold;
+                font-size: 15px;
+            }
+            .success {
+                background-color: #d4edda;
+                color: #155724;
+                border: 1px solid #c3e6cb;
+            }
+            .error {
+                background-color: #f8d7da;
+                color: #721c24;
+                border: 1px solid #f5c6cb;
+            }
+            .warning {
+                background-color: #fff3cd;
+                color: #856404;
+                border: 1px solid #ffeeba;
+            }
+            input, select {
+                margin: 10px 0;
+                padding: 8px;
+                width: 90%;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                font-size: 14px;
+            }
+            button {
+                background-color: #ffcc00;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: bold;
+                color: #333;
+                transition: background-color 0.3s;
+            }
+            button:hover {
+                background-color: #e6b800;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="contenedor">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo Creativ Proyectos">
+            <h2>Registro de Asistencia</h2>
+            {% if mensaje %}
+                <div class="alert {{clase}}">{{mensaje}}</div>
+            {% endif %}
+            <form method="post" onsubmit="return enviarUbicacion();">
+                <input type="text" name="nombre" placeholder="Nombre" required><br>
+                <input type="text" name="dni" placeholder="DNI" required><br>
+                <select name="tipo" required>
+                    <option value="Entrada">Entrada</option>
+                    <option value="Salida">Salida</option>
+                </select><br>
+                <input type="hidden" name="lat" id="lat">
+                <input type="hidden" name="lon" id="lon">
+                <button type="submit">Marcar asistencia</button>
+            </form>
+        </div>
+        <script>
+        function enviarUbicacion() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(pos) {
+                    document.getElementById("lat").value = pos.coords.latitude;
+                    document.getElementById("lon").value = pos.coords.longitude;
+                    document.forms[0].submit();
+                });
+                return false;
+            } else {
+                alert("Tu navegador no soporta GPS");
+                return false;
+            }
+        }
+        </script>
+    </body>
+    </html>
+''', mensaje=mensaje, clase=clase)
