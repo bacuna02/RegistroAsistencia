@@ -36,7 +36,6 @@ def distancia(lat1, lon1, lat2, lon2):
 
 def guardar_google_sheets(nombre, dni, fecha, hora, tipo, lat, lon):
     registros = sheet.get_all_values()
-    # Validar que no registre más de una vez por día en cada tipo
     for fila in registros:
         if len(fila) >= 5 and fila[1] == dni and fila[2] == fecha and fila[4] == tipo:
             return False
@@ -45,23 +44,27 @@ def guardar_google_sheets(nombre, dni, fecha, hora, tipo, lat, lon):
 
 @app.route("/", methods=["GET", "POST"])
 def asistencia():
+    mensaje = None
+    clase = None
+
     if request.method == "POST":
         nombre = request.form["nombre"]
         dni = request.form["dni"]
-        tipo = request.form["tipo"]  # Entrada o Salida
+        tipo = request.form["tipo"]
         lat = float(request.form["lat"])
         lon = float(request.form["lon"])
         fecha = datetime.now(tz).strftime("%Y-%m-%d")
         hora = datetime.now(tz).strftime("%H:%M:%S")
 
-        # Validar ubicación
         if distancia(lat, lon, TALLER_LAT, TALLER_LON) > RADIO_PERMITIDO:
-            return "❌ No estás en el taller, registro rechazado"
-
-        if not guardar_google_sheets(nombre, dni, fecha, hora, tipo, lat, lon):
-            return f"❌ Ya registraste {tipo} hoy"
-
-        return f"✅ {tipo} registrada correctamente a las {hora}"
+            mensaje = "❌ No estás en el taller, registro rechazado"
+            clase = "error"
+        elif not guardar_google_sheets(nombre, dni, fecha, hora, tipo, lat, lon):
+            mensaje = f"❌ Ya registraste {tipo} hoy"
+            clase = "warning"
+        else:
+            mensaje = f"✅ {tipo} registrada correctamente a las {hora}"
+            clase = "success"
 
     return render_template_string(f'''
         <!DOCTYPE html>
@@ -86,15 +89,29 @@ def asistencia():
                     border-radius: 10px;
                     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
                     text-align: center;
-                    width: 320px;
+                    width: 340px;
                 }}
-                .contenedor img {{
-                    width: 120px;
-                    margin-bottom: 15px;
-                }}
-                h2 {{
-                    color: #333;
+                .alert {{
+                    padding: 15px;
                     margin-bottom: 20px;
+                    border-radius: 8px;
+                    font-weight: bold;
+                    font-size: 15px;
+                }}
+                .success {{
+                    background-color: #d4edda;
+                    color: #155724;
+                    border: 1px solid #c3e6cb;
+                }}
+                .error {{
+                    background-color: #f8d7da;
+                    color: #721c24;
+                    border: 1px solid #f5c6cb;
+                }}
+                .warning {{
+                    background-color: #fff3cd;
+                    color: #856404;
+                    border: 1px solid #ffeeba;
                 }}
                 input, select {{
                     margin: 10px 0;
@@ -123,6 +140,9 @@ def asistencia():
             <div class="contenedor">
                 <img src="{{{{ url_for('static', filename='logo.png') }}}}" alt="Logo Creativ Proyectos">
                 <h2>Registro de Asistencia</h2>
+                {% if mensaje %}
+                    <div class="alert {{clase}}">{{mensaje}}</div>
+                {% endif %}
                 <form method="post" onsubmit="return enviarUbicacion();">
                     <input type="text" name="nombre" placeholder="Nombre" required><br>
                     <input type="text" name="dni" placeholder="DNI" required><br>
@@ -152,7 +172,7 @@ def asistencia():
             </script>
         </body>
         </html>
-    ''')
+    ''', mensaje=mensaje, clase=clase)
 
 if __name__ == "__main__":
     app.run(debug=True)
